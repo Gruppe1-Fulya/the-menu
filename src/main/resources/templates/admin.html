@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+</head>
+
+<body>
+    <main>
+        <h3>Admin</h3>
+
+        <form action="#" th:action="@{/admin}" th:object="${category}" method="post">
+            <input type="text" placeholder="Category Name" name="name" required>
+            <button type="submit">Add Category</button>
+        </form>
+
+        <h4>Categories</h4>
+
+        <div class="category-container">
+            <div class="category-card" th:each="category: ${categories}">
+                <p th:text="${category.name}"></p>
+                <div class="category-card-btns">
+                    <button class="editButton" th:value="${category.id}">Edit</button>
+                    <button class="deleteButton" th:value="${category.id}">Delete</button>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script>
+    const editButtons = document.querySelectorAll(".editButton");
+    const deleteButtons = document.querySelectorAll(".deleteButton");
+
+    editButtons.forEach((button) => {
+        button.addEventListener("click", (event) => {
+            location.assign(`/admin/${event.target.value}`);
+        });
+    });
+
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", async (event) => {
+            await fetch(`/admin/category/${event.target.value}`, {
+                method: "DELETE",
+                redirect: "manual",
+            });
+            location.reload();
+        });
+    });
+</script>
+
+<style>
+    main {
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .category-container {
+        width: max-content;
+    }
+
+    .category-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .category-card-btns {
+        height: 50%;
+        margin-left: auto;
+    }
+</style>
+
+</html>

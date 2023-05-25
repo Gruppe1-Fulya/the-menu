@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category</title>
+</head>
+
+<body>
+    <main>
+        <h4 th:text="${category.name}"></h4>
+
+        <div>
+            <input id="category-name" type="text" name="name" th:value="${category.name}" placeholder="Category Name">
+            <button id="rename-btn" type="submit">Rename</button>
+        </div>
+
+        <form action="#" th:action="${category.id}" method="post">
+            <input type="text" name="name" placeholder="Name" required>
+            <input type="number" name="price" placeholder="Price" required>
+            <button type="submit">Create Item</button>
+        </form>
+
+        <div style="width: max-content;">
+            <div class="item-card" th:each="item: ${items}">
+                <input type="text" th:id="${'name-' + item.id}" th:value="${item.name}" placeholder="Name" required>
+                <input type="number" th:id="${'price-' + item.id}" th:value="${item.price}" placeholder="Price"
+                    required>
+                <button class="editButton" th:value="${item.id}">Edit</button>
+                <button class="deleteButton" th:value="${item.id}">Delete</button>
+            </div>
+        </div>
+    </main>
+</body>
+
+<script>
+    const category = "[[${category.id}]]";
+    const newName = document.querySelector("#category-name");
+    const renameButton = document.querySelector("#rename-btn");
+    const editButtons = document.querySelectorAll(".editButton");
+    const deleteButtons = document.querySelectorAll(".deleteButton");
+
+    renameButton.addEventListener("click", async (event) => {
+        const name = newName.value;
+        const data = new FormData();
+
+        data.append("id", category);
+        data.append("name", name);
+
+        await fetch(`/admin/category/${category}`, {
+            method: "PATCH",
+            redirect: "manual",
+            body: data,
+        });
+        location.reload();
+    });
+
+    editButtons.forEach((button) => {
+        button.addEventListener("click", async (event) => {
+            const id = event.target.value;
+            const name = document.querySelector(`#name-${id}`).value;
+            const price = document.querySelector(`#price-${id}`).value;
+            const data = new FormData();
+
+            data.append("id", id);
+            data.append("name", name);
+            data.append("price", price);
+
+            await fetch(`/admin/item/${id}`, {
+                method: "PATCH",
+                redirect: "manual",
+                body: data,
+            });
+            location.reload();
+        });
+    });
+
+    deleteButtons.forEach((button) => {
+        button.addEventListener("click", async (event) => {
+            const id = event.target.value;
+            await fetch(`/admin/item/${id}`, {
+                method: "DELETE",
+                redirect: "manual",
+            });
+            location.reload();
+        });
+    });
+</script>
+
+<style>
+    main {
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .item-card {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .item-card button {
+        height: 50%;
+    }
+</style>
+
+</html>
